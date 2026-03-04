@@ -1,25 +1,21 @@
-FROM debian:bookworm-slim
+#!/bin/sh
+set -e
 
-# Instalar Node.js 20 + herramientas necesarias
-RUN apt-get update && apt-get install -y \
-    curl \
-    ca-certificates \
-    iptables \
-    iproute2 \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+echo "🔧 Iniciando Tailscale daemon..."
+tailscaled --state=mem: --tun=userspace-networking &
+sleep 4
 
-# Instalar Tailscale
-RUN curl -fsSL https://tailscale.com/install.sh | sh
+echo "🔗 Conectando a red Tailscale..."
+tailscale up \
+  --authkey="${TAILSCALE_AUTHKEY}" \
+  --hostname="render-biblioteca" \
+  --netfilter-mode=off \
+  --accept-routes
 
-WORKDIR /app
-COPY package.json ./
-RUN npm install
-COPY . .
+echo ""
+echo "✅ Estado de Tailscale:"
+tailscale status
 
-RUN chmod +x start.sh
-
-EXPOSE 10000
-
-CMD ["./start.sh"]
+echo ""
+echo "🚀 Iniciando proxy → ${LOCAL_TARGET}"
+node proxy.js
