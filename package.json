@@ -1,0 +1,13 @@
+{
+  "name": "biblioteca-istlt-proxy",
+  "version": "1.0.0",
+  "description": "Proxy Tailscale para Biblioteca Digital ISTLT",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6"
+  }
+}
