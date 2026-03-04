@@ -11,7 +11,6 @@ echo "🔗 Conectando a red Tailscale..."
 tailscale up \
   --authkey="${TAILSCALE_AUTHKEY}" \
   --hostname="render-biblioteca" \
-  --ephemeral \
   --accept-routes
 
 echo ""
