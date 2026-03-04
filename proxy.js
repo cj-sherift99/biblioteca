@@ -3,18 +3,14 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app  = express();
 const PORT = process.env.PORT || 10000;
-
-// IP Tailscale de tu Ubuntu + puerto de la biblioteca
-const TARGET = process.env.LOCAL_TARGET || 'http://100.90.166.10:3000';
+const TARGET = process.env.LOCAL_TARGET || 'http://100.90.166.10:3000'\;
 
 console.log(`📡 Proxy configurado → ${TARGET}`);
 
-// Health check para Render
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', target: TARGET, time: new Date().toISOString() });
 });
 
-// Proxy de todo el tráfico al servidor local
 app.use('/', createProxyMiddleware({
   target: TARGET,
   changeOrigin: true,
@@ -24,12 +20,14 @@ app.use('/', createProxyMiddleware({
   on: {
     error: (err, req, res) => {
       console.error(`[proxy error] ${err.message}`);
+      // Página amigable de espera con auto-recarga
       if (!res.headersSent) {
-        res.status(502).send(`
+        res.status(503).send(`
           <!DOCTYPE html>
           <html>
           <head>
-            <title>Biblioteca ISTLT — No disponible</title>
+            <title>Biblioteca ISTLT — Conectando...</title>
+            <meta http-equiv="refresh" content="5">
             <style>
               body { font-family: sans-serif; background: #0e1235; color: #fff;
                      display: flex; align-items: center; justify-content: center;
@@ -37,21 +35,23 @@ app.use('/', createProxyMiddleware({
               .box { padding: 40px; }
               h1 { color: #fecc09; font-size: 2rem; margin-bottom: 12px; }
               p  { color: #bab9ba; }
+              .spinner { margin: 20px auto; width: 40px; height: 40px;
+                         border: 4px solid rgba(255,255,255,0.1);
+                         border-top-color: #fecc09;
+                         border-radius: 50%; animation: spin 1s linear infinite; }
+              @keyframes spin { to { transform: rotate(360deg); } }
             </style>
           </head>
           <body>
             <div class="box">
               <h1>📚 Biblioteca ISTLT</h1>
-              <p>El servidor local no está disponible en este momento.</p>
-              <p style="margin-top:8px;font-size:0.85rem;opacity:0.6">Intenta de nuevo en unos minutos.</p>
+              <div class="spinner"></div>
+              <p>Conectando al servidor... La página se recargará automáticamente.</p>
             </div>
           </body>
           </html>
         `);
       }
-    },
-    proxyReq: (proxyReq, req) => {
-      console.log(`→ ${req.method} ${req.url}`);
     }
   }
 }));
