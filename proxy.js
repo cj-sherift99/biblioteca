@@ -11,6 +11,16 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', target: TARGET, time: new Date().toISOString() });
 });
 
+// Aquí insertas el nuevo endpoint de testeo
+app.get('/test-target', async (req, res) => {
+  try {
+    const response = await fetch(TARGET);
+    res.send(`OK: ${await response.text()}`);
+  } catch (err) {
+    res.status(500).send(`Error: ${err.message}`);
+  }
+});
+
 app.use('/', createProxyMiddleware({
   target: TARGET,
   changeOrigin: true,
