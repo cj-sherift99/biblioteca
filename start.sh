@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-echo "🔧 Arrancando Tailscale daemon en modo userspace..."
-tailscaled --state=mem: --tun=userspace-networking &
+echo "🔧 Arrancando Tailscale daemon con proxy SOCKS5..."
+tailscaled --state=mem: --tun=userspace-networking --socks5-server=localhost:1055 &
 
 echo "🔗 Conectando a Tailscale..."
 sleep 3   # tiempo mínimo para que arranque el daemon
