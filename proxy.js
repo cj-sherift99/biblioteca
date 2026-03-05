@@ -25,8 +25,8 @@ app.use('/', createProxyMiddleware({
   target: TARGET,
   changeOrigin: true,
   ws: true,
-  timeout: 30000,
-  proxyTimeout: 30000,
+  timeout: 60000,
+  proxyTimeout: 60000,
   on: {
     error: (err, req, res) => {
       console.error(`[proxy error] ${err.message}`);
